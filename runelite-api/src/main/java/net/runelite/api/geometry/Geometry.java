@@ -36,6 +36,69 @@ import java.util.function.Consumer;
 
 public class Geometry
 {
+	private static void appendUnitLines(GeneralPath path, float unitSize,
+										float x1, float y1, float x2, float y2)
+	{
+		float x = x1;
+		float y = y1;
+		float angle = (float)Math.atan2(y2 - y1, x2 - x1);
+		float dx = (float)Math.cos(angle) * unitSize;
+		float dy = (float)Math.sin(angle) * unitSize;
+		float length = (float)Math.hypot(x2 - x1, y2 - y1);
+		int steps = (int)((length - 1e-4) / unitSize);
+		for (int i = 0; i < steps; i++)
+		{
+			x += dx;
+			y += dy;
+			path.lineTo(Math.round(x), Math.round(y));
+		}
+	}
+
+	public static GeneralPath unitifyPath(PathIterator it, float unitSize)
+	{
+		GeneralPath newPath = new GeneralPath();
+		float[] prevCoords = new float[2];
+		float[] coords = new float[2];
+		float[] startCoords = null;
+		while (!it.isDone())
+		{
+			int type = it.currentSegment(coords);
+			if (type == PathIterator.SEG_MOVETO)
+			{
+				if (startCoords == null)
+				{
+					startCoords = new float[2];
+					startCoords[0] = coords[0];
+					startCoords[1] = coords[1];
+				}
+				newPath.moveTo(coords[0], coords[1]);
+				prevCoords[0] = coords[0];
+				prevCoords[1] = coords[1];
+			}
+			else if (type == PathIterator.SEG_LINETO)
+			{
+				appendUnitLines(newPath, unitSize, prevCoords[0], prevCoords[1], coords[0], coords[1]);
+				newPath.lineTo(coords[0], coords[1]);
+				prevCoords[0] = coords[0];
+				prevCoords[1] = coords[1];
+			}
+			else if (type == PathIterator.SEG_CLOSE)
+			{
+				appendUnitLines(newPath, unitSize, coords[0], coords[1], startCoords[0], startCoords[1]);
+				newPath.closePath();
+				startCoords = null;
+			}
+			it.next();
+		}
+
+		return newPath;
+	}
+
+	public static GeneralPath unitifyPath(GeneralPath path, float unitSize)
+	{
+		return unitifyPath(path.getPathIterator(new AffineTransform()), unitSize);
+	}
+
 	/**
 	 * Find the point where two lines intersect.
 	 *
