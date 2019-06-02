@@ -5,7 +5,7 @@ import net.runelite.client.config.Config;
 import net.runelite.client.config.ConfigGroup;
 import net.runelite.client.config.ConfigItem;
 
-@ConfigGroup("wilyLevelLines")
+@ConfigGroup("wildyLevelLines")
 public interface WildyLevelLinesConfig extends Config
 {
 	@ConfigItem(
