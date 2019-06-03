@@ -7,19 +7,17 @@ public class WildyLine
 {
 	private int x1;
 	private int x2;
-	private int y1;
-	private int y2;
+	private int y;
 	private int plane;
 	private Line2D line;
 
-	WildyLine(int plane, int x1, int y1, int x2, int y2)
+	WildyLine(int plane, int x1, int x2, int y)
 	{
 		this.x1 = x1;
-		this.y1 = y1;
+		this.y = y;
 		this.x2 = x2;
-		this.y2 = y2;
 		this.plane = plane;
-		this.line = new Line2D.Float(x1, y1, x2, y2);
+		this.line = new Line2D.Float(x1, y, x2, y);
 	}
 
 	int getX1()
@@ -32,14 +30,9 @@ public class WildyLine
 		return x2;
 	}
 
-	int getY1()
+	int getY()
 	{
-		return y1;
-	}
-
-	int getY2()
-	{
-		return y2;
+		return y;
 	}
 
 	int getPlane()
@@ -64,6 +57,6 @@ public class WildyLine
 			return null;
 		}
 
-		return new WildyLine(plane, Math.max(r.x, x1), y1, Math.min(r.x + r.width, x2), y2);
+		return new WildyLine(plane, Math.max(r.x, x1), Math.min(r.x + r.width, x2), y);
 	}
 }

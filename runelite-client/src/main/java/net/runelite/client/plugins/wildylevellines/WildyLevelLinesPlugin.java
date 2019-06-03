@@ -115,8 +115,12 @@ public class WildyLevelLinesPlugin extends Plugin
 					paths[p] = new GeneralPath();
 				}
 
-				paths[p].moveTo(innerLine.getX1(), innerLine.getY1());
-				paths[p].lineTo(innerLine.getX2(), innerLine.getY2());
+				paths[p].moveTo(innerLine.getX1(), innerLine.getY());
+
+				for (int x = innerLine.getX1() + 1; x <= innerLine.getX2(); x++)
+				{
+					paths[p].lineTo(x, innerLine.getY());
+				}
 			}
 		}
 
@@ -128,12 +132,6 @@ public class WildyLevelLinesPlugin extends Plugin
 				paths[i] = Geometry.transformPath(paths[i], this::transformWorldToLocal);
 			}
 		}
-	}
-
-	@Subscribe
-	public void onConfigChanged(ConfigChanged event)
-	{
-		log.info("config changed");
 	}
 
 	@Subscribe

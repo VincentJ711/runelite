@@ -7,6 +7,6 @@ public class MainWildyLine extends WildyLine
 
 	MainWildyLine(int longitude)
 	{
-		super(0, LEFT_BOUND, longitude, RIGHT_BOUND, longitude);
+		super(0, LEFT_BOUND, RIGHT_BOUND, longitude);
 	}
 }
