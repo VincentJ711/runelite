@@ -11,7 +11,6 @@ import net.runelite.api.Constants;
 import net.runelite.api.GameState;
 import net.runelite.api.Perspective;
 import net.runelite.api.coords.LocalPoint;
-import net.runelite.api.events.ConfigChanged;
 import net.runelite.api.events.GameStateChanged;
 import net.runelite.api.geometry.Geometry;
 import net.runelite.client.callback.ClientThread;
@@ -128,7 +127,6 @@ public class WildyLevelLinesPlugin extends Plugin
 		{
 			if (paths[i] != null)
 			{
-				log.info(i + "");
 				paths[i] = Geometry.transformPath(paths[i], this::transformWorldToLocal);
 			}
 		}
