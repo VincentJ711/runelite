@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, Devin French <https://github.com/devinfrench>
+ * Copyright (c) 2019 Abex
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -22,46 +22,27 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package net.runelite.api;
+package net.runelite.client;
 
-import java.util.function.Predicate;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import net.runelite.client.ui.FontManager;
 
 /**
- * A query to search the game for objects that match.
- *
- * @param <EntityType> the returned object type
- * @param <QueryType> the query type
+ * Loads some slow to initialize classes (hopefully) before they are needed to streamline client startup
  */
-public abstract class Query<EntityType, QueryType>
+@SuppressWarnings({"ResultOfMethodCallIgnored", "unused"})
+class ClassPreloader
 {
-	protected Predicate<EntityType> predicate = x -> true;
-
-	protected Query()
+	static void preload()
 	{
-	}
+		// This needs to enumerate the system fonts for some reason, and that takes a while
+		FontManager.getRunescapeSmallFont();
 
-	/**
-	 * Executes the query and filters through possible objects, returning only
-	 * those who evaluate true using {@link #predicate}.
-	 *
-	 * @param client the game client
-	 * @return the matching objects
-	 */
-	public abstract EntityType[] result(Client client);
+		// This needs to load a timezone database that is mildly large
+		ZoneId.of("Europe/London");
 
-	/**
-	 * Constructs and returns a predicate that will evaluate {@link #predicate}
-	 * and the passed value.
-	 *
-	 * @param other the passed predicate
-	 * @return the combined predicate
-	 */
-	protected Predicate<EntityType> and(Predicate<EntityType> other)
-	{
-		if (predicate == null)
-		{
-			return other;
-		}
-		return predicate.and(other);
+		// This just needs to call 20 different DateTimeFormatter constructors, which are slow
+		Object unused = DateTimeFormatter.BASIC_ISO_DATE;
 	}
 }

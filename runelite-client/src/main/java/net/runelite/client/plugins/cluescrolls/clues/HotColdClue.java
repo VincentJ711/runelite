@@ -160,7 +160,7 @@ public class HotColdClue extends ClueScroll implements LocationClueScroll, Locat
 		else
 		{
 			panelComponent.getChildren().add(LineComponent.builder()
-				.left("Possible areas:")
+				.left("Possible locations:")
 				.build());
 
 			final Map<HotColdArea, Integer> locationCounts = new EnumMap<>(HotColdArea.class);
@@ -292,7 +292,8 @@ public class HotColdClue extends ClueScroll implements LocationClueScroll, Locat
 			return false;
 		}
 
-		final WorldPoint localWorld = plugin.getClient().getLocalPlayer().getWorldLocation();
+		// Convert from real to overworld
+		final WorldPoint localWorld = ClueScrollPlugin.getMirrorPoint(plugin.getClient().getLocalPlayer().getWorldLocation(), true);
 
 		if (localWorld == null)
 		{

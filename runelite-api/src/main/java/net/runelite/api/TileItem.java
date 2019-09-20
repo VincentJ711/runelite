@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, Lotto <https://github.com/devLotto>
+ * Copyright (c) 2016-2017, Adam <Adam@sigterm.info>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -22,51 +22,25 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package net.runelite.client.plugins.cluescrolls.clues.emote;
+package net.runelite.api;
 
-import net.runelite.api.Client;
-import net.runelite.api.Item;
-
-public class AllRequirementsCollection implements ItemRequirement
+/**
+ * Represents an item inside an {@link ItemLayer}.
+ */
+public interface TileItem extends Renderable
 {
-	private ItemRequirement[] requirements;
+	/**
+	 * Gets the items ID.
+	 *
+	 * @return the ID of the item
+	 * @see ItemID
+	 */
+	int getId();
 
-	public AllRequirementsCollection(ItemRequirement... requirements)
-	{
-		this.requirements = requirements;
-	}
-
-	@Override
-	public boolean fulfilledBy(int itemId)
-	{
-		for (ItemRequirement requirement : requirements)
-		{
-			if (requirement.fulfilledBy(itemId))
-			{
-				return true;
-			}
-		}
-
-		return false;
-	}
-
-	@Override
-	public boolean fulfilledBy(Item[] items)
-	{
-		for (ItemRequirement requirement : requirements)
-		{
-			if (!requirement.fulfilledBy(items))
-			{
-				return false;
-			}
-		}
-
-		return true;
-	}
-
-	@Override
-	public String getCollectiveName(Client client)
-	{
-		return "N/A";
-	}
+	/**
+	 * Gets the items quantity.
+	 *
+	 * @return the items quantity
+	 */
+	int getQuantity();
 }

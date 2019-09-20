@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, Lotto <https://github.com/devLotto>
+ * Copyright (c) 2019, TheStonedTurtle <https://github.com/TheStonedTurtle>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -22,47 +22,13 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package net.runelite.client.plugins.cluescrolls.clues.emote;
+package net.runelite.client.plugins.bank;
 
-import net.runelite.api.Client;
-import net.runelite.api.Item;
+import lombok.Value;
 
-public class RangeItemRequirement implements ItemRequirement
+@Value
+class ContainerPrices
 {
-	private String name;
-	private int startItemId;
-	private int endItemId;
-
-	public RangeItemRequirement(String name, int startItemId, int endItemId)
-	{
-		this.name = name;
-		this.startItemId = startItemId;
-		this.endItemId = endItemId;
-	}
-
-	@Override
-	public boolean fulfilledBy(int itemId)
-	{
-		return itemId >= startItemId && itemId <= endItemId;
-	}
-
-	@Override
-	public boolean fulfilledBy(Item[] items)
-	{
-		for (Item item : items)
-		{
-			if (item.getId() >= startItemId && item.getId() <= endItemId)
-			{
-				return true;
-			}
-		}
-
-		return false;
-	}
-
-	@Override
-	public String getCollectiveName(Client client)
-	{
-		return name;
-	}
+	private long gePrice;
+	private long highAlchPrice;
 }
