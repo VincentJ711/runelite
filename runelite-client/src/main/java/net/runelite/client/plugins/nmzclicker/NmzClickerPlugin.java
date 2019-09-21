@@ -1,5 +1,6 @@
 package net.runelite.client.plugins.nmzclicker;
 
+import com.google.gson.JsonObject;
 import com.google.inject.Provides;
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -28,6 +29,7 @@ import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.input.KeyManager;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
+import net.runelite.client.ui.ClientUI;
 import net.runelite.client.ui.overlay.OverlayManager;
 
 @Slf4j
@@ -40,63 +42,21 @@ public class NmzClickerPlugin extends Plugin
 {
 	private static final Path LOG_FILE = Paths.get(Paths.get(System.getProperty("user.home")).toString(),
 		"desktop", "nmz-auto-clicker", "runelite.log");
-	private static BufferedWriter writer;
-	private static long lastFTime = 0;
+	private static final String LOG_DELIMITER_REGULAR = "REGULAR";
+	static final String LOG_DELIMITER_KEY_PRESSED = "KEY_PRESSED";
 	private static final int[] NMZ_MAP_REGION = {9033};
 
-
-	static void logToFile(String delimiter)
-	{
-		logToFile(delimiter, "");
-	}
-
-	static void logToFile(String delimiter, String text)
-	{
-		long currTime = 0;
-		boolean doesntExist = false;
-
-		try
-		{
-			currTime = getCreateTime();
-		}
-		catch (IOException e)
-		{
-			doesntExist = true;
-		}
-
-		try
-		{
-			if (doesntExist || (writer == null) || (lastFTime != currTime))
-			{
-				writer = Files.newBufferedWriter(LOG_FILE, StandardCharsets.UTF_8,
-					StandardOpenOption.CREATE, StandardOpenOption.APPEND);
-				lastFTime = getCreateTime();
-			}
-
-			writer.write("[" + delimiter + "] " + text + "\n");
-			writer.flush();
-		}
-		catch (IOException e)
-		{
-
-		}
-	}
-
-	private static long getCreateTime() throws IOException
-	{
-		BasicFileAttributes attr = Files.readAttributes(LOG_FILE, BasicFileAttributes.class);
-		return attr.creationTime().toMillis();
-	}
-
-	private final int[] lastSkillLevels = new int[Skill.values().length - 1];
-	boolean wasInNmz = false;
-	private int lastAbsPts = 0;
-	private int lastLoggedAbsPts = 0;
-	private String lastInvy = "";
+	private String invy = "";
+	private int absPts;
 	private Timer timer;
+	private BufferedWriter writer;
+	private long lastFTime = 0;
+	private long ticks = 0;
 
 	@Inject
 	private Client client;
+
+	@Inject ClientUI ui;
 
 	@Inject
 	private OverlayManager overlayManager;
@@ -110,7 +70,6 @@ public class NmzClickerPlugin extends Plugin
 	@Inject
 	private NmzClickerChatListener chatKeyboardListener;
 
-
 	@Subscribe
 	public void onConfigChanged(ConfigChanged event)
 	{
@@ -123,167 +82,86 @@ public class NmzClickerPlugin extends Plugin
 		return configManager.getConfig(NmzClickerConfig.class);
 	}
 
+
 	@Override
 	protected void startUp() throws Exception
 	{
-		timer = new Timer();
-		timer.scheduleAtFixedRate(new InNmzCheckTask(this), 0, 5000);
+		deleteLogFile();
 		keyManager.registerKeyListener(chatKeyboardListener);
-		wasInNmz = false;
-		init();
 	}
 
 	@Override
 	protected void shutDown() throws Exception
 	{
-		timer.cancel();
-		timer = null;
 		keyManager.unregisterKeyListener(chatKeyboardListener);
-	}
-
-	private void init()
-	{
-		lastAbsPts = 0;
-		lastLoggedAbsPts = 0;
-		lastInvy = "";
-		Arrays.fill(lastSkillLevels, -1);
-	}
-
-	private int getAbsorptionPts()
-	{
-		return client.getVar(Varbits.NMZ_ABSORPTION);
-	}
-
-	public boolean isInNightmareZone()
-	{
-		return Arrays.equals(client.getMapRegions(), NMZ_MAP_REGION);
-	}
-
-	private void checkStatChange(Skill skill)
-	{
-		int skillIdx = skill.ordinal();
-		int last = lastSkillLevels[skillIdx];
-		int cur = client.getBoostedSkillLevel(skill);
-
-		if (cur == last)
-		{
-			return;
-		}
-
-		if (cur == (last + 1))
-		{
-			if (skill.equals(Skill.HITPOINTS))
-			{
-				logToFile(LogDelimiters.HP_INC, cur + "");
-			}
-		}
-		else if (cur < last)
-		{
-			if (skill.equals(Skill.ATTACK))
-			{
-				logToFile(LogDelimiters.ATTACK_DEC, cur + "");
-			}
-			else if (skill.equals(Skill.STRENGTH))
-			{
-				logToFile(LogDelimiters.STRENGTH_DEC, cur + "");
-			}
-			else if (skill.equals(Skill.DEFENCE))
-			{
-				logToFile(LogDelimiters.DEFENCE_DEC, cur + "");
-			}
-			else if (skill.equals(Skill.RANGED))
-			{
-				logToFile(LogDelimiters.RANGE_DEC, cur + "");
-			}
-			else if (skill.equals(Skill.MAGIC))
-			{
-				logToFile(LogDelimiters.MAGIC_DEC, cur + "");
-			}
-			else if (skill.equals(Skill.PRAYER))
-			{
-				logToFile(LogDelimiters.PRAYER_DEC, cur + "");
-			}
-		}
-
-		lastSkillLevels[skillIdx] = cur;
 	}
 
 	@Subscribe
 	public void onGameTick(GameTick event)
 	{
-		checkInNmz();
-
-		if (wasInNmz)
+		if (ticks == 0)
 		{
-			int currAbsPts = getAbsorptionPts();
+			ticks++;
 
-			if ((currAbsPts != 0) && (currAbsPts < lastAbsPts) && (currAbsPts <= (lastLoggedAbsPts - 50)))
+			if (client.getGameState() != GameState.LOGGED_IN)
 			{
-				lastLoggedAbsPts = currAbsPts;
-				logToFile(LogDelimiters.ABSORPTION_DEC, currAbsPts + "");
+				return;
 			}
 
-			if (currAbsPts > lastAbsPts)
+			JsonObject o = new JsonObject();
+
+			setInvy();
+			setAbsPts();
+
+			if (invy == null)
 			{
-				lastLoggedAbsPts = currAbsPts;
+				return;
 			}
 
-			lastAbsPts = currAbsPts;
+			o.addProperty("nmz", Arrays.equals(client.getMapRegions(), NMZ_MAP_REGION));
+			o.addProperty("attack", client.getBoostedSkillLevel(Skill.ATTACK));
+			o.addProperty("strength", client.getBoostedSkillLevel(Skill.STRENGTH));
+			o.addProperty("defence", client.getBoostedSkillLevel(Skill.DEFENCE));
+			o.addProperty("magic", client.getBoostedSkillLevel(Skill.MAGIC));
+			o.addProperty("ranged", client.getBoostedSkillLevel(Skill.RANGED));
+			o.addProperty("hitpoints", client.getBoostedSkillLevel(Skill.HITPOINTS));
+			o.addProperty("prayer", client.getBoostedSkillLevel(Skill.PRAYER));
+			o.addProperty("abs", absPts);
+			o.addProperty("invy", invy);
 
-			checkStatChange(Skill.ATTACK);
-			checkStatChange(Skill.STRENGTH);
-			checkStatChange(Skill.DEFENCE);
-			checkStatChange(Skill.MAGIC);
-			checkStatChange(Skill.RANGED);
-			checkStatChange(Skill.HITPOINTS);
-			checkStatChange(Skill.PRAYER);
-			checkInvy();
+			o.addProperty("bot", config.bot());
+			o.addProperty("soundType", config.soundType().toString());
+			o.addProperty("skipFrequency", config.skipFrequency());
+			o.addProperty("minAtt", config.attackThreshold());
+			o.addProperty("minStr", config.strengthThreshold());
+			o.addProperty("minDef", config.defenceThreshold());
+			o.addProperty("minRng", config.rangeThreshold());
+			o.addProperty("minMage", config.magicThreshold());
+			o.addProperty("minPray", config.prayerThreshold());
+			o.addProperty("minAbs", config.absThreshold());
+
+			logToFile(LOG_DELIMITER_REGULAR, o.toString());
 		}
+		else if (ticks == 1)
+		{
+			ticks = 0;
+		}
+
 	}
 
-	void checkInNmz()
+	private void setAbsPts()
 	{
-		checkInNmz(false);
-	}
-
-	void checkInNmz(boolean recurringCheck)
-	{
-		if (recurringCheck && (client.getGameState() != GameState.LOGGED_IN))
+		try
 		{
-			return;
+			absPts = client.getVar(Varbits.NMZ_ABSORPTION);
 		}
-
-		boolean nowInNmz = isInNightmareZone();
-		String delimiter = null;
-
-		if (wasInNmz && !nowInNmz)
+		catch (Error e)
 		{
-			delimiter = LogDelimiters.NMZ_OFF;
-			wasInNmz = false;
-		}
-		else if (!wasInNmz && nowInNmz)
-		{
-			delimiter = LogDelimiters.NMZ_ON;
-			wasInNmz = true;
-			init();
-		}
-
-		if (delimiter != null)
-		{
-			logToFile(delimiter);
-		}
-		else if (recurringCheck)
-		{
-			logToFile(nowInNmz ? LogDelimiters.NMZ_ON : LogDelimiters.NMZ_OFF);
+			absPts = 0;
 		}
 	}
 
-	void checkInvy()
-	{
-		this.checkInvy(false);
-	}
-
-	void checkInvy(boolean recurringCheck)
+	private void setInvy()
 	{
 		ItemContainer cont = client.getItemContainer(InventoryID.INVENTORY);
 		String tempInvy = "";
@@ -362,6 +240,20 @@ public class NmzClickerPlugin extends Plugin
 					tempInvy += "4P";
 					break;
 
+
+				case ItemID.OVERLOAD_1:
+					tempInvy += "1V";
+					break;
+				case ItemID.OVERLOAD_2:
+					tempInvy += "2V";
+					break;
+				case ItemID.OVERLOAD_3:
+					tempInvy += "3V";
+					break;
+				case ItemID.OVERLOAD_4:
+					tempInvy += "4V";
+					break;
+
 				case ItemID.ABSORPTION_1:
 					tempInvy += "1A";
 					break;
@@ -381,16 +273,56 @@ public class NmzClickerPlugin extends Plugin
 			tempInvy += " ";
 		}
 
-		String next = tempInvy.trim();
+		invy = tempInvy.trim();
+	}
 
-		if (!next.equals(lastInvy))
+	private void deleteLogFile()
+	{
+		try
 		{
-			logToFile(LogDelimiters.INVY_CHECK, next);
-			lastInvy = next;
+			Files.delete(LOG_FILE);
 		}
-		else if (recurringCheck)
+		catch (IOException e)
 		{
-			logToFile(LogDelimiters.INVY_CHECK, next);
+
 		}
+	}
+
+	void logToFile(String delimiter, String text)
+	{
+		long currTime = 0;
+		boolean doesntExist = false;
+
+		try
+		{
+			currTime = getCreateTime();
+		}
+		catch (IOException e)
+		{
+			doesntExist = true;
+		}
+
+		try
+		{
+			if (doesntExist || (writer == null) || (lastFTime != currTime))
+			{
+				writer = Files.newBufferedWriter(LOG_FILE, StandardCharsets.UTF_8,
+					StandardOpenOption.CREATE, StandardOpenOption.APPEND);
+				lastFTime = getCreateTime();
+			}
+
+			writer.write("[" + delimiter + "] " + text + "\n");
+			writer.flush();
+		}
+		catch (IOException e)
+		{
+
+		}
+	}
+
+	private long getCreateTime() throws IOException
+	{
+		BasicFileAttributes attr = Files.readAttributes(LOG_FILE, BasicFileAttributes.class);
+		return attr.creationTime().toMillis();
 	}
 }

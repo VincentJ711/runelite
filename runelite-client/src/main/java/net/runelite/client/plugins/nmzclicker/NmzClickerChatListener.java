@@ -19,6 +19,8 @@ public class NmzClickerChatListener implements KeyListener
 	@Inject
 	private ClientThread clientThread;
 
+	@Inject NmzClickerPlugin p;
+
 	@Override
 	public void keyTyped(KeyEvent e)
 	{
@@ -38,7 +40,7 @@ public class NmzClickerChatListener implements KeyListener
 			return;
 		}
 
-		NmzClickerPlugin.logToFile(LogDelimiters.KEY_PRESSED, e.getKeyChar() + "");
+		p.logToFile(NmzClickerPlugin.LOG_DELIMITER_KEY_PRESSED, e.getKeyChar() + "");
 	}
 
 	@Override
