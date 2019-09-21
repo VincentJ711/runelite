@@ -12,6 +12,6 @@ public class LogDelimiters
 	static final String ABSORPTION_DEC = "ABS_DEC";
 	static final String NMZ_ON = "NMZ_ON";
 	static final String NMZ_OFF = "NMZ_OFF";
-	static final String INVY_CHANGED = "INVY_CHANGED";
+	static final String INVY_CHECK = "INVY_CHECK";
 	static final String KEY_PRESSED = "KEY_PRESSED";
 }

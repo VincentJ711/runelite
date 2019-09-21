@@ -13,6 +13,7 @@ public class InNmzCheckTask extends TimerTask
 
 	public void run()
 	{
+		plugin.checkInvy(true);
 		plugin.checkInNmz(true);
 	}
 }

@@ -8,11 +8,13 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Arrays;
 import java.util.Timer;
 import javax.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
+import net.runelite.api.GameState;
 import net.runelite.api.InventoryID;
 import net.runelite.api.Item;
 import net.runelite.api.ItemContainer;
@@ -38,8 +40,10 @@ public class NmzClickerPlugin extends Plugin
 {
 	private static final Path LOG_FILE = Paths.get(Paths.get(System.getProperty("user.home")).toString(),
 		"desktop", "nmz-auto-clicker", "runelite.log");
+	private static BufferedWriter writer;
+	private static long lastFTime = 0;
 	private static final int[] NMZ_MAP_REGION = {9033};
-	private static final String LOG_DELIMITER = "MY_NMZ_LOG";
+
 
 	static void logToFile(String delimiter)
 	{
@@ -48,17 +52,40 @@ public class NmzClickerPlugin extends Plugin
 
 	static void logToFile(String delimiter, String text)
 	{
+		long currTime = 0;
+		boolean doesntExist = false;
+
 		try
 		{
-			BufferedWriter x = Files.newBufferedWriter(LOG_FILE, StandardCharsets.UTF_8,
-				StandardOpenOption.CREATE, StandardOpenOption.APPEND);
-
-			x.write("[" + delimiter + "] " + text + "\n");
-			x.close();
+			currTime = getCreateTime();
 		}
 		catch (IOException e)
 		{
+			doesntExist = true;
 		}
+
+		try
+		{
+			if (doesntExist || (writer == null) || (lastFTime != currTime))
+			{
+				writer = Files.newBufferedWriter(LOG_FILE, StandardCharsets.UTF_8,
+					StandardOpenOption.CREATE, StandardOpenOption.APPEND);
+				lastFTime = getCreateTime();
+			}
+
+			writer.write("[" + delimiter + "] " + text + "\n");
+			writer.flush();
+		}
+		catch (IOException e)
+		{
+
+		}
+	}
+
+	private static long getCreateTime() throws IOException
+	{
+		BasicFileAttributes attr = Files.readAttributes(LOG_FILE, BasicFileAttributes.class);
+		return attr.creationTime().toMillis();
 	}
 
 	private final int[] lastSkillLevels = new int[Skill.values().length - 1];
@@ -102,6 +129,7 @@ public class NmzClickerPlugin extends Plugin
 		timer = new Timer();
 		timer.scheduleAtFixedRate(new InNmzCheckTask(this), 0, 5000);
 		keyManager.registerKeyListener(chatKeyboardListener);
+		wasInNmz = false;
 		init();
 	}
 
@@ -111,12 +139,6 @@ public class NmzClickerPlugin extends Plugin
 		timer.cancel();
 		timer = null;
 		keyManager.unregisterKeyListener(chatKeyboardListener);
-	}
-
-	private void exitedNmz()
-	{
-		logToFile(LogDelimiters.NMZ_OFF);
-		wasInNmz = false;
 	}
 
 	private void init()
@@ -224,8 +246,13 @@ public class NmzClickerPlugin extends Plugin
 		checkInNmz(false);
 	}
 
-	void checkInNmz(boolean alwaysLogToFile)
+	void checkInNmz(boolean recurringCheck)
 	{
+		if (recurringCheck && (client.getGameState() != GameState.LOGGED_IN))
+		{
+			return;
+		}
+
 		boolean nowInNmz = isInNightmareZone();
 		String delimiter = null;
 
@@ -245,13 +272,18 @@ public class NmzClickerPlugin extends Plugin
 		{
 			logToFile(delimiter);
 		}
-		else if (alwaysLogToFile)
+		else if (recurringCheck)
 		{
 			logToFile(nowInNmz ? LogDelimiters.NMZ_ON : LogDelimiters.NMZ_OFF);
 		}
 	}
 
-	private void checkInvy()
+	void checkInvy()
+	{
+		this.checkInvy(false);
+	}
+
+	void checkInvy(boolean recurringCheck)
 	{
 		ItemContainer cont = client.getItemContainer(InventoryID.INVENTORY);
 		String tempInvy = "";
@@ -353,8 +385,12 @@ public class NmzClickerPlugin extends Plugin
 
 		if (!next.equals(lastInvy))
 		{
-			logToFile(LogDelimiters.INVY_CHANGED, next);
+			logToFile(LogDelimiters.INVY_CHECK, next);
 			lastInvy = next;
+		}
+		else if (recurringCheck)
+		{
+			logToFile(LogDelimiters.INVY_CHECK, next);
 		}
 	}
 }
