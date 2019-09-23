@@ -3,7 +3,9 @@ package net.runelite.client.plugins.nmzclicker;
 import com.google.gson.JsonObject;
 import com.google.inject.Provides;
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -86,7 +88,7 @@ public class NmzClickerPlugin extends Plugin
 	@Override
 	protected void startUp() throws Exception
 	{
-		deleteLogFile();
+		emptyLogFile();
 		keyManager.registerKeyListener(chatKeyboardListener);
 	}
 
@@ -276,11 +278,13 @@ public class NmzClickerPlugin extends Plugin
 		invy = tempInvy.trim();
 	}
 
-	private void deleteLogFile()
+	private void emptyLogFile()
 	{
 		try
 		{
-			Files.delete(LOG_FILE);
+			PrintWriter p = new PrintWriter(LOG_FILE.toString());
+			p.print("");
+			p.close();
 		}
 		catch (IOException e)
 		{
@@ -309,6 +313,9 @@ public class NmzClickerPlugin extends Plugin
 				writer = Files.newBufferedWriter(LOG_FILE, StandardCharsets.UTF_8,
 					StandardOpenOption.CREATE, StandardOpenOption.APPEND);
 				lastFTime = getCreateTime();
+				File f = new File(LOG_FILE.toString());
+				f.setReadable(true, false);
+				f.setWritable(true, false);
 			}
 
 			writer.write("[" + delimiter + "] " + text + "\n");
