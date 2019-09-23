@@ -130,7 +130,7 @@ public class NmzClickerPlugin extends Plugin
 			o.addProperty("invy", invy);
 
 			o.addProperty("bot", config.bot());
-			o.addProperty("soundType", config.soundType().toString());
+			o.addProperty("sound", config.sound());
 			o.addProperty("skipFrequency", config.skipFrequency());
 			o.addProperty("minAtt", config.attackThreshold());
 			o.addProperty("minStr", config.strengthThreshold());

@@ -10,7 +10,9 @@ public interface NmzClickerConfig extends Config
 	@ConfigItem(
 		keyName = "bot",
 		name = "Bot",
-		description = "have the script do the work for you",
+		description = "this will move around and drink for you when low on something.<br/>" +
+			"i recommend turning this on only after you've<br/>rock caked/overloaded down " +
+			"and absorptioned up on nmz start",
 		position = 5
 	)
 	default boolean bot()
@@ -19,20 +21,20 @@ public interface NmzClickerConfig extends Config
 	}
 
 	@ConfigItem(
-		keyName = "soundType",
-		name = "Sound Type",
-		description = "",
+		keyName = "sound",
+		name = "Sound",
+		description = "plays when you go beneath a threshold or outside of nmz",
 		position = 10
 	)
-	default SoundType soundType()
+	default boolean sound()
 	{
-		return SoundType.NONE;
+		return true;
 	}
 
 	@ConfigItem(
 		keyName = "absorption threshold",
 		name = "Absorption Threshold",
-		description = "",
+		description = "drink/play sound when lte this",
 		position = 20
 	)
 	default int absThreshold()
@@ -43,7 +45,7 @@ public interface NmzClickerConfig extends Config
 	@ConfigItem(
 		keyName = "attack threshold",
 		name = "Attack Threshold",
-		description = "",
+		description = "drink/play sound when lte this",
 		position = 30
 	)
 	default int attackThreshold()
@@ -54,7 +56,7 @@ public interface NmzClickerConfig extends Config
 	@ConfigItem(
 		keyName = "strength threshold",
 		name = "Strength Threshold",
-		description = "",
+		description = "drink/play sound when lte this",
 		position = 40
 	)
 	default int strengthThreshold()
@@ -65,7 +67,7 @@ public interface NmzClickerConfig extends Config
 	@ConfigItem(
 		keyName = "defence threshold",
 		name = "Defence Threshold",
-		description = "",
+		description = "drink/play sound when lte this",
 		position = 50
 	)
 	default int defenceThreshold()
@@ -77,7 +79,7 @@ public interface NmzClickerConfig extends Config
 	@ConfigItem(
 		keyName = "magic threshold",
 		name = "Magic Threshold",
-		description = "",
+		description = "drink/play sound when lte this",
 		position = 60
 	)
 	default int magicThreshold()
@@ -88,7 +90,7 @@ public interface NmzClickerConfig extends Config
 	@ConfigItem(
 		keyName = "range threshold",
 		name = "Range Threshold",
-		description = "",
+		description = "drink/play sound when lte this",
 		position = 70
 	)
 	default int rangeThreshold()
@@ -99,7 +101,7 @@ public interface NmzClickerConfig extends Config
 	@ConfigItem(
 		keyName = "prayer threshold",
 		name = "Prayer Threshold",
-		description = "",
+		description = "drink/play sound when lte this",
 		position = 80
 	)
 	default int prayerThreshold()
@@ -108,7 +110,7 @@ public interface NmzClickerConfig extends Config
 	}
 
 	@ConfigItem(
-		keyName = "skip frequency(0-99)",
+		keyName = "skip frequency 0-99",
 		name = "Skip Frequency",
 		description = "how often you want to skip a guzzle",
 		position = 90
