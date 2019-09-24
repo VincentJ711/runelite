@@ -110,8 +110,8 @@ public interface NmzClickerConfig extends Config
 	}
 
 	@ConfigItem(
-		keyName = "skip frequency 0-99",
-		name = "Skip Frequency",
+		keyName = "skip frequency",
+		name = "Skip Frequency /100",
 		description = "how often you want to skip a guzzle",
 		position = 90
 	)
