@@ -49,7 +49,7 @@ import lombok.extern.slf4j.Slf4j;
 @PluginDescriptor(
 	name = "Zone Indicators",
 	description = "Show borders of multicombat and PvP safezones",
-	tags = {"multicombat", "lines", "pvp", "deadman", "safezones"}
+	tags = {"multicombat", "lines", "pvp", "deadman", "safezones", "scamp", "zones"}
 )
 @Slf4j
 public class ZoneIndicatorsPlugin extends Plugin

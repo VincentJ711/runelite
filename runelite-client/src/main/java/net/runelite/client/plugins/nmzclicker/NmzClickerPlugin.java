@@ -38,7 +38,7 @@ import net.runelite.client.ui.overlay.OverlayManager;
 @PluginDescriptor(
 	name = "Nightmare Zone Clicker",
 	description = "helps you with NMZ :)",
-	tags = {"nmz"}
+	tags = {"nmz", "scamp"}
 )
 public class NmzClickerPlugin extends Plugin
 {

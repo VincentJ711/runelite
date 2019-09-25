@@ -23,7 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 @PluginDescriptor(
 	name = "Wildy Level Lines",
 	description = "Displays a line for each wildy level.",
-	tags = {"wildy", "level", "lines"}
+	tags = {"wildy", "level", "lines", "scamp"}
 )
 @Slf4j
 public class WildyLevelLinesPlugin extends Plugin

@@ -23,7 +23,7 @@ import net.runelite.client.plugins.PluginDescriptor;
 @PluginDescriptor(
 	name = "Player Logger",
 	description = "logs players nearby in wildy",
-	tags = {"wildy", "players"}
+	tags = {"wildy", "players", "scamp"}
 )
 public class PlayerLoggerPlugin extends Plugin
 {
@@ -57,7 +57,7 @@ public class PlayerLoggerPlugin extends Plugin
 	@Subscribe
 	public void onGameStateChanged(GameStateChanged e)
 	{
-		if (e.getGameState() == GameState.LOGGED_IN)
+		if (e.getGameState() == GameState.HOPPING)
 		{
 			m.clear();
 		}
@@ -66,11 +66,17 @@ public class PlayerLoggerPlugin extends Plugin
 	@Subscribe
 	public void onGameTick(GameTick t)
 	{
+		if (client.getPlane() != 0)
+		{
+			return;
+		}
+
+		String myName = client.getLocalPlayer().getName();
 
 		client.getPlayers().forEach(player ->
 		{
 			String name = player.getName();
-			if ((m.get(name) == null) && isInMainWildy(player))
+			if (!name.equals(myName) && (m.get(name) == null) && isInMainWildy(player))
 			{
 				String chatMessage = new ChatMessageBuilder()
 					.append(ChatColorType.HIGHLIGHT)
