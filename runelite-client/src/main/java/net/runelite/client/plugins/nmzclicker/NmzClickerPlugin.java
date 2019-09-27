@@ -131,7 +131,6 @@ public class NmzClickerPlugin extends Plugin
 			o.addProperty("abs", absPts);
 			o.addProperty("invy", invy);
 
-			o.addProperty("bot", config.bot());
 			o.addProperty("sound", config.sound());
 			o.addProperty("skipFrequency", config.skipFrequency());
 			o.addProperty("minAtt", config.attackThreshold());
