@@ -64,39 +64,18 @@ public class ScampCommandsPlugin extends Plugin
 		String cmd = "";
 		String cmdArgs[] = null;
 
-		if (client.getLocalPlayer() == null)
-		{
-			return;
-		}
-
-		log.info(e.getName());
-		log.info(client.getLocalPlayer().getName());
-
-		log.info(client.getLocalPlayer().getName().equals(e.getName()) + "");
-
-		log.info(im.getItemPrice(ItemID.DEATH_RUNE) + "");
-		log.info(im.getItemPrice(ItemID.DEATH_RUNE_6432) + "");
-		log.info(im.getItemPrice(ItemID.DEATH_RUNE_11692) + "");
-		log.info(im.getItemPrice(ItemID.DEATH_RUNE_NZ) + "");
-
-
-//		if (!e.getName().equals(client.getLocalPlayer().getName()))
-//		{
-//			return;
-//		}
-
-		if ((tokens.length == 0) || !tokens[0].equals("!Scamp"))
+		if ((tokens.length == 0) || !tokens[0].equals("!S"))
 		{
 			return;
 		}
 
 		if (tokens.length == 1)
 		{
-			toChat("xpto [lvl] [skill], xp [startlvl] [endlvl]");
-			toChat("drunesto [lvl], drunes [startlvl] [endlvl] (assumes 60k xp/hr)");
-			toChat("brunesto [lvl], brunes [startlvl] [endlvl] (assumes 74k xp/hr)");
-			toChat("wrunesto [lvl], wrunes [startlvl] [endlvl] (assumes 88k xp/hr)");
-			toChat("bpto [lvl] [xp/hr ie 75], bp [startlvl] [endlvl] [xp/hr]");
+			toChat("xpt [lvl] [skill], xp [startlvl] [endlvl]");
+			toChat("drt [lvl], dr [startlvl] [endlvl] (assumes 60k xp/hr)");
+			toChat("brt [lvl], br [startlvl] [endlvl] (assumes 74k xp/hr)");
+			toChat("wrt [lvl], wr [startlvl] [endlvl] (assumes 88k xp/hr)");
+			toChat("bpt [lvl] [xp/hr ie 75], bp [startlvl] [endlvl] [xp/hr]");
 			return;
 		}
 
@@ -110,7 +89,7 @@ public class ScampCommandsPlugin extends Plugin
 			cmdArgs = Arrays.copyOfRange(tokens, 2, tokens.length);
 		}
 
-		if (cmd.equals("xpto"))
+		if (cmd.equals("xpt"))
 		{
 			handleXpToCmd(cmdArgs);
 		}
@@ -118,29 +97,88 @@ public class ScampCommandsPlugin extends Plugin
 		{
 			handleXpCmd(cmdArgs);
 		}
-		else if (cmd.equals("drunesto"))
+		else if (cmd.equals("drt"))
 		{
 			handleDRunesToCmd(cmdArgs);
 		}
-		else if (cmd.equals("drunes"))
+		else if (cmd.equals("dr"))
 		{
 			handleDRunesCmd(cmdArgs);
 		}
-		else if (cmd.equals("brunesto"))
+		else if (cmd.equals("brt"))
 		{
 			handleBRunesToCmd(cmdArgs);
 		}
-		else if (cmd.equals("brunes"))
+		else if (cmd.equals("br"))
 		{
 			handleBRunesCmd(cmdArgs);
 		}
-		else if (cmd.equals("wrunesto"))
+		else if (cmd.equals("wrt"))
 		{
 			handleWRunesToCmd(cmdArgs);
 		}
-		else if (cmd.equals("wrunes"))
+		else if (cmd.equals("wr"))
 		{
 			handleWRunesCmd(cmdArgs);
+		}
+		else if (cmd.equals("bpt"))
+		{
+			handleBpToCmd(cmdArgs);
+		}
+		else if (cmd.equals("bp"))
+		{
+			handleBpCmd(cmdArgs);
+		}
+	}
+
+	private void handleBpToCmd(String[] args)
+	{
+		if ((args == null) || args.length != 2)
+		{
+			return;
+		}
+
+		try
+		{
+			int endlvl = Integer.parseInt(args[0]);
+			int xpRate = Integer.parseInt(args[1]) * 1000;
+			int xpDelta = Experience.getXpForLevel(endlvl) - client.getSkillExperience(Skill.RANGED);
+			double hours = (double) xpDelta / xpRate;
+			int dartsNeeded = (int) Math.floor(800 * hours);
+			int scalesNeeded = (int) Math.floor(2000 * hours);
+			int price = im.getItemPrice(ItemID.ZULRAHS_SCALES);
+			int totalPrice = price * scalesNeeded;
+			toChat(scalesNeeded + " scales @ " + price + "gp ea => " + totalPrice + "gp, " + dartsNeeded + " darts, " + String.format("%.2f", hours) + " hours");
+		}
+		catch (Throwable e)
+		{
+
+		}
+	}
+
+	private void handleBpCmd(String[] args)
+	{
+		if ((args == null) || args.length != 3)
+		{
+			return;
+		}
+
+		try
+		{
+			int startlvl = Integer.parseInt(args[0]);
+			int endlvl = Integer.parseInt(args[1]);
+			int xpRate = Integer.parseInt(args[2]) * 1000;
+			int xpDelta = Experience.getXpForLevel(endlvl) - Experience.getXpForLevel(startlvl);
+			double hours = (double) xpDelta / xpRate;
+			int dartsNeeded = (int) Math.floor(800 * hours);
+			int scalesNeeded = (int) Math.floor(2000 * hours);
+			int price = im.getItemPrice(ItemID.ZULRAHS_SCALES);
+			int totalPrice = price * scalesNeeded;
+			toChat(scalesNeeded + " scales @ " + price + "gp ea => " + totalPrice + "gp, " + dartsNeeded + " darts, " + String.format("%.2f", hours) + " hours");
+		}
+		catch (Throwable e)
+		{
+
 		}
 	}
 
@@ -180,32 +218,32 @@ public class ScampCommandsPlugin extends Plugin
 
 	private void handleDRunesToCmd(String args[])
 	{
-		handleRunesToCmd(200, 60000, args);
+		handleRunesToCmd(im.getItemPrice(ItemID.DEATH_RUNE), 60000, args);
 	}
 
 	private void handleDRunesCmd(String args[])
 	{
-		handleRunesCmd(200, 60000, args);
+		handleRunesCmd(im.getItemPrice(ItemID.DEATH_RUNE), 60000, args);
 	}
 
 	private void handleBRunesToCmd(String args[])
 	{
-		handleRunesToCmd(300, 74000, args);
+		handleRunesToCmd(im.getItemPrice(ItemID.BLOOD_RUNE), 74000, args);
 	}
 
 	private void handleBRunesCmd(String args[])
 	{
-		handleRunesCmd(300, 74000, args);
+		handleRunesCmd(im.getItemPrice(ItemID.BLOOD_RUNE), 74000, args);
 	}
 
 	private void handleWRunesToCmd(String args[])
 	{
-		handleRunesToCmd(400, 88000, args);
+		handleRunesToCmd(im.getItemPrice(ItemID.WRATH_RUNE), 88000, args);
 	}
 
 	private void handleWRunesCmd(String args[])
 	{
-		handleRunesCmd(400, 88000, args);
+		handleRunesCmd(im.getItemPrice(ItemID.WRATH_RUNE), 88000, args);
 	}
 
 	private void handleRunesToCmd(int runecost, int xpRate, String args[])
@@ -240,8 +278,9 @@ public class ScampCommandsPlugin extends Plugin
 		{
 			int endxp = Experience.getXpForLevel(Integer.parseInt(endlvl));
 			int xpDelta = endxp - startxp;
-			int runesNeeded = (int) Math.floor((xpDelta / xpRate) * 1200);
-			toChat(runesNeeded + " runes needed @ " + runecost + "gp ea => " + runesNeeded * runecost + "gp");
+			double hours = (double) xpDelta / xpRate;
+			int runesNeeded = (int) Math.floor(hours * 1200);
+			toChat(runesNeeded + " needed @ " + runecost + "gp ea => " + runesNeeded * runecost + "gp, " + String.format("%.2f", hours) + " hours");
 		}
 		catch (Throwable e)
 		{
@@ -252,7 +291,9 @@ public class ScampCommandsPlugin extends Plugin
 	private int getXpToLevel(int lvl, String skillName)
 	{
 		Skill skill = Skill.valueOf(skillName.toUpperCase());
-		return getXpToLevel(client.getRealSkillLevel(skill), lvl);
+		int startxp = client.getSkillExperience(skill);
+		int endxp = Experience.getXpForLevel(lvl);
+		return endxp - startxp;
 	}
 
 	private int getXpToLevel(int startlvl, int endlvl)
