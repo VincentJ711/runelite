@@ -186,41 +186,52 @@ public class NmzClickerPlugin extends Plugin
 					tempInvy += "0X";
 					break;
 				case ItemID.SUPER_RANGING_1:
+				case ItemID.DIVINE_RANGING_POTION1:
 					tempInvy += "1R";
 					break;
 				case ItemID.SUPER_RANGING_2:
+				case ItemID.DIVINE_RANGING_POTION2:
 					tempInvy += "2R";
 					break;
 				case ItemID.SUPER_RANGING_3:
+				case ItemID.DIVINE_RANGING_POTION3:
 					tempInvy += "3R";
 					break;
 				case ItemID.SUPER_RANGING_4:
+				case ItemID.DIVINE_RANGING_POTION4:
 					tempInvy += "4R";
 					break;
-
 				case ItemID.SUPER_MAGIC_POTION_1:
+				case ItemID.DIVINE_MAGIC_POTION1:
 					tempInvy += "1M";
 					break;
 				case ItemID.SUPER_MAGIC_POTION_2:
+				case ItemID.DIVINE_MAGIC_POTION2:
 					tempInvy += "2M";
 					break;
 				case ItemID.SUPER_MAGIC_POTION_3:
+				case ItemID.DIVINE_MAGIC_POTION3:
 					tempInvy += "3M";
 					break;
 				case ItemID.SUPER_MAGIC_POTION_4:
+				case ItemID.DIVINE_MAGIC_POTION4:
 					tempInvy += "4M";
 					break;
 
 				case ItemID.SUPER_COMBAT_POTION1:
+				case ItemID.DIVINE_SUPER_COMBAT_POTION1:
 					tempInvy += "1C";
 					break;
 				case ItemID.SUPER_COMBAT_POTION2:
+				case ItemID.DIVINE_SUPER_COMBAT_POTION2:
 					tempInvy += "2C";
 					break;
 				case ItemID.SUPER_COMBAT_POTION3:
+				case ItemID.DIVINE_SUPER_COMBAT_POTION3:
 					tempInvy += "3C";
 					break;
 				case ItemID.SUPER_COMBAT_POTION4:
+				case ItemID.DIVINE_SUPER_COMBAT_POTION4:
 					tempInvy += "4C";
 					break;
 
