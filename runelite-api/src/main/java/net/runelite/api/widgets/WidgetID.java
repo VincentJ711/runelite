@@ -143,6 +143,7 @@ public class WidgetID
 	public static final int ITEMS_KEPT_ON_DEATH_GROUP_ID = 4;
 	public static final int SEED_VAULT_GROUP_ID = 631;
 	public static final int EXPLORERS_RING_ALCH_GROUP_ID = 483;
+	public static final int OPTIONS_GROUP_ID = 261;
 
 	static class WorldMap
 	{
@@ -735,11 +736,11 @@ public class WidgetID
 
 	static class Pvp
 	{
-		static final int BOUNTY_HUNTER_INFO = 18;
-		static final int KILLDEATH_RATIO = 15;
-		static final int SKULL_CONTAINER = 61;
-		static final int SAFE_ZONE = 63;
-		static final int WILDERNESS_LEVEL = 66; // this can also be the Deadman Mode "Protection" text
+		static final int BOUNTY_HUNTER_INFO = 6;
+		static final int KILLDEATH_RATIO = 33;
+		static final int SKULL_CONTAINER = 53;
+		static final int SAFE_ZONE = 55;
+		static final int WILDERNESS_LEVEL = 58; // this can also be the Deadman Mode "Protection" text
 	}
 
 	static class KourendFavour
@@ -833,5 +834,12 @@ public class WidgetID
 	static class ExplorersRing
 	{
 		static final int INVENTORY = 7;
+	}
+
+	static class Options
+	{
+		static final int MUSIC_SLIDER = 44;
+		static final int SOUND_EFFECT_SLIDER = 50;
+		static final int AREA_SOUND_SLIDER = 56;
 	}
 }
