@@ -37,13 +37,16 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import net.runelite.api.Actor;
 import net.runelite.api.Client;
 import net.runelite.api.GameState;
+import net.runelite.api.Player;
 import net.runelite.api.ScriptID;
 import net.runelite.api.SoundEffectID;
 import net.runelite.api.SpriteID;
 import net.runelite.api.VarClientInt;
 import net.runelite.api.VarPlayer;
+import net.runelite.api.events.AreaSoundEffectPlayed;
 import net.runelite.api.events.ConfigChanged;
 import net.runelite.api.events.GameStateChanged;
 import net.runelite.api.events.ScriptCallbackEvent;
@@ -408,13 +411,21 @@ public class MusicPlugin extends Plugin
 			{
 				{
 					Widget handle = slider.getHandle();
-					Widget[] siblings = handle.getParent().getChildren();
-					if (siblings.length < handle.getIndex() || siblings[handle.getIndex()] != handle)
+					Widget parent = handle.getParent();
+					if (parent == null)
 					{
 						continue;
 					}
-					siblings[slider.getTrack().getIndex()] = null;
-					siblings[handle.getIndex()] = null;
+					else
+					{
+						Widget[] siblings = parent.getChildren();
+						if (siblings == null || handle.getIndex() >= siblings.length || siblings[handle.getIndex()] != handle)
+						{
+							continue;
+						}
+						siblings[slider.getTrack().getIndex()] = null;
+						siblings[handle.getIndex()] = null;
+					}
 				}
 
 				Object[] init = icon.getOnLoadListener();
@@ -441,10 +452,18 @@ public class MusicPlugin extends Plugin
 			Widget handle = slider.getHandle();
 			if (handle != null)
 			{
-				Widget[] siblings = handle.getParent().getChildren();
-				if (siblings.length < handle.getIndex() || siblings[handle.getIndex()] != handle)
+				Widget parent = handle.getParent();
+				if (parent == null)
 				{
 					handle = null;
+				}
+				else
+				{
+					Widget[] siblings = parent.getChildren();
+					if (siblings == null || handle.getIndex() >= siblings.length || siblings[handle.getIndex()] != handle)
+					{
+						handle = null;
+					}
 				}
 			}
 			if (handle == null)
@@ -530,6 +549,18 @@ public class MusicPlugin extends Plugin
 			case "optionsAllSounds":
 				// We have to override this script because it gets invoked periodically from the server
 				client.getIntStack()[client.getIntStackSize() - 1] = -1;
+		}
+	}
+
+	@Subscribe
+	public void onAreaSoundEffectPlayed(AreaSoundEffectPlayed areaSoundEffectPlayed)
+	{
+		Actor source = areaSoundEffectPlayed.getSource();
+		if (source != client.getLocalPlayer()
+			&& source instanceof Player
+			&& musicConfig.muteOtherAreaSounds())
+		{
+			areaSoundEffectPlayed.consume();
 		}
 	}
 }
