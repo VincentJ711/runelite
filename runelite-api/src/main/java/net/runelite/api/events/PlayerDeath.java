@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, Adam <Adam@sigterm.info>
+ * Copyright (c) 2018, Matthew Steglinski <https://github.com/sainttx>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -22,20 +22,16 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
 package net.runelite.api.events;
 
-import lombok.Data;
-import net.runelite.api.Skill;
+import lombok.Value;
+import net.runelite.api.Player;
 
 /**
- * An event where the experience level of a {@link Skill} has been modified.
+ * An event fired when a player dies.
  */
-@Data
-public class ExperienceChanged
+@Value
+public class PlayerDeath
 {
-	/**
-	 * The modified skill.
-	 */
-	private Skill skill;
+	private final Player player;
 }
