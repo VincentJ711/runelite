@@ -9,7 +9,6 @@ import net.runelite.api.Experience;
 import net.runelite.api.ItemID;
 import net.runelite.api.Skill;
 import net.runelite.api.events.ChatMessage;
-import net.runelite.api.events.ConfigChanged;
 import net.runelite.client.chat.ChatColorType;
 import net.runelite.client.chat.ChatMessageBuilder;
 import net.runelite.client.chat.ChatMessageManager;
@@ -35,13 +34,6 @@ public class ScampCommandsPlugin extends Plugin
 
 	@Inject
 	ChatMessageManager chatMessageManager;
-
-
-	@Subscribe
-	public void onConfigChanged(ConfigChanged event)
-	{
-
-	}
 
 
 	@Override

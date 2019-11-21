@@ -24,7 +24,6 @@ import net.runelite.api.ItemContainer;
 import net.runelite.api.ItemID;
 import net.runelite.api.Skill;
 import net.runelite.api.Varbits;
-import net.runelite.api.events.ConfigChanged;
 import net.runelite.api.events.GameTick;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
@@ -71,12 +70,6 @@ public class NmzClickerPlugin extends Plugin
 
 	@Inject
 	private NmzClickerChatListener chatKeyboardListener;
-
-	@Subscribe
-	public void onConfigChanged(ConfigChanged event)
-	{
-
-	}
 
 	@Provides
 	NmzClickerConfig getConfig(ConfigManager configManager)
