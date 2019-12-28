@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, Adam <Adam@sigterm.info>
+ * Copyright (c) 2019, Adam <Adam@sigterm.info>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -22,19 +22,23 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package net.runelite.api.events;
+package net.runelite.client.plugins.loottracker;
 
-import lombok.Value;
-import net.runelite.api.Nameable;
+import java.util.Collection;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import net.runelite.client.game.ItemStack;
+import net.runelite.http.api.loottracker.LootRecordType;
 
 /**
- * An event trigger when a player is removed from the friend or ignore list.
+ * Event published by the loottracker plugin when new loot is received
  */
-@Value
-public class RemovedFriend
+@Data
+@AllArgsConstructor
+public class LootReceived
 {
-	/**
-	 * The removed friend or ignore entry
-	 */
-	private final Nameable nameable;
+	private String name;
+	private int combatLevel;
+	private LootRecordType type;
+	private Collection<ItemStack> items;
 }
