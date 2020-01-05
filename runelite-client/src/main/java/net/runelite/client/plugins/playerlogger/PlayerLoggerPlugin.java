@@ -72,6 +72,7 @@ public class PlayerLoggerPlugin extends Plugin
 		}
 
 		String myName = client.getLocalPlayer().getName();
+		int world = client.getWorld();
 
 		client.getPlayers().forEach(player ->
 		{
@@ -80,7 +81,7 @@ public class PlayerLoggerPlugin extends Plugin
 			{
 				String chatMessage = new ChatMessageBuilder()
 					.append(ChatColorType.HIGHLIGHT)
-					.append(name + ": " + player.getCombatLevel())
+					.append(String.format("%0$-8s", "w" + world + "/" + player.getCombatLevel()) + " " + name)
 					.build();
 
 				chatMessageManager.queue(QueuedMessage.builder()
